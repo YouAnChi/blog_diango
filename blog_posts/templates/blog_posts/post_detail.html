@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }} - 我的博客</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .blog-header {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .post-content {
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .comment-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        .comment {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="blog-header text-center">
+        <div class="container">
+            <h1 class="display-4">{{ post.title }}</h1>
+            <p class="lead">
+                <small class="text-light">作者：{{ post.author.username }} | 发布时间：{{ post.published_date|date:"Y-m-d H:i" }}</small>
+            </p>
+            <a href="{% url 'post_list' %}" class="btn btn-light">返回首页</a>
+            {% if user.is_authenticated and user == post.author %}
+                <a href="{% url 'post_edit' pk=post.pk %}" class="btn btn-outline-light">编辑文章</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="post-content">
+            {% if post.image %}
+                <img src="{{ post.image.url }}" class="post-image" alt="{{ post.title }}">
+            {% endif %}
+            {{ post.content|linebreaks }}
+        </article>
+
+        <section class="comment-section">
+            <h3>评论</h3>
+            {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'add_comment' pk=post.pk %}" class="mb-4">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="text" class="form-control" rows="3" placeholder="写下你的评论..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">发表评论</button>
+                </form>
+            {% else %}
+                <p class="text-muted">请登录后发表评论</p>
+            {% endif %}
+
+            <div class="comments-list">
+                {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <h6 class="mb-2">{{ comment.author.username }}</h6>
+                        <p class="mb-1">{{ comment.text|linebreaks }}</p>
+                        <small class="text-muted">{{ comment.created_date|date:"Y-m-d H:i" }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-4 mt-5 text-muted">
+        <p>博客示例 &copy; 2024</p>
+    </footer>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
