@@ -45,7 +45,7 @@
 1. 克隆项目到本地：
    ```bash
    git clone [项目地址]
-   cd xinwen
+   cd blog_diango
    ```
 
 2. 创建并激活虚拟环境（推荐）：
